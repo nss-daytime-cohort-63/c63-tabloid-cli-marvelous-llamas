@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.Design;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -129,6 +130,14 @@ namespace TabloidCLI.UserInterfaceManagers
                 }
                 _journalRepository.Update(_editJournal);
                 Console.WriteLine("Journal has been updated. Press any key to continue...");
+                Console.ReadKey();
+            }
+            private void Remove() 
+            {
+                Console.WriteLine("Select the journal you would like to delete.");
+                Journal _journalToDelete = Choose();
+                _journalRepository.Delete(_journalToDelete.Id);
+                Console.WriteLine("Post has been deleted. Press any key to continue.");
                 Console.ReadKey();
             }
     }
