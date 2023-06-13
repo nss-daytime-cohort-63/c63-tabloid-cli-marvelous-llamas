@@ -47,8 +47,16 @@ namespace TabloidCLI.UserInterfaceManagers
                         return this;
                     }
                     else
-                    {
-                        return new JournalDetailsManager(this, _connectionString, journal.Id);
+                    {   
+                        {
+                            Console.WriteLine("=====================================");
+                            Console.WriteLine($"{journal.Id}) {journal.Title}");
+                            Console.WriteLine("-------------------------------------");
+                            Console.WriteLine(journal.Content);
+                        }
+                        Console.WriteLine("Press any key to continue...");
+                        Console.ReadKey();
+                        return this;
                     }
                 case ("3"):
                     Add();
@@ -75,12 +83,31 @@ namespace TabloidCLI.UserInterfaceManagers
                     Console.ReadKey();
                 }
             }
+            private Journal Choose()
+            {
+                Console.WriteLine("Enter the corresponding number of the journal you would like to choose.");
+                List<Journal> _selectJournals = _journalRepository.GetAll();
+                for(int i = 0; i < _selectJournals.Count; i++)
+                {
+                    Console.WriteLine($"{i}) {_selectJournals[i].Title}");
+                }
 
+                int _chosenJournal = int.Parse(Console.ReadLine());
+                return _journalRepository.Get(_chosenJournal);
+            }
             private void Add()
             {
-                Console.WriteLine("Enter the Journal's title.");
+                Console.WriteLine("Enter the new journal's title.");
                 string _jTitle = Console.ReadLine();
                 /*Title, Id, Content, CreateDateTime*/
+                Console.WriteLine("Enter the new journal's content.");
+                string _jContent = Console.ReadLine();
+                Journal _newJournal = new Journal(){
+                    Title = _jTitle,
+                    Content = _jContent,
+                    CreateDateTime = DateTime.Now
+                };
+                _journalRepository.Insert(_newJournal);
             }
     }
 }
