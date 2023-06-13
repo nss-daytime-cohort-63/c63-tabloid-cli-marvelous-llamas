@@ -111,19 +111,17 @@ namespace TabloidCLI.Repositories
                     cmd.CommandText = @"SELECT j.Id AS JournalId,
                                                j.Title,
                                                j.Content,
-                                               j.CreateDateTime,
+                                               j.CreateDateTime
                                           FROM Journal j
-                                         WHERE a.id = @id";
+                                         WHERE j.id = @id";
 
                     cmd.Parameters.AddWithValue("@id", id);
 
                     Journal journal = null;
 
                     SqlDataReader reader = cmd.ExecuteReader();
-                    while (reader.Read())
+                    if (reader.Read())
                     {
-                        if (journal == null)
-                        {
                             journal = new Journal()
                             {
                                 Id = reader.GetInt32(reader.GetOrdinal("JournalId")),
@@ -131,7 +129,6 @@ namespace TabloidCLI.Repositories
                                 Content = reader.GetString(reader.GetOrdinal("Content")),
                                 CreateDateTime = reader.GetDateTime(reader.GetOrdinal("CreateDateTime")),
                             };
-                        }
                     }
 
                     reader.Close();
