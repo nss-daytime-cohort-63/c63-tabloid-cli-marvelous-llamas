@@ -109,5 +109,27 @@ namespace TabloidCLI.UserInterfaceManagers
                 };
                 _journalRepository.Insert(_newJournal);
             }
+
+            private void Edit()
+            {
+                Console.WriteLine("Select a journal to edit.");
+                Journal _editJournal = Choose();
+
+                Console.WriteLine("Enter a new title for the journal. (Leave blank for no change)");
+                string _editTitle = Console.ReadLine();
+                if(!string.IsNullOrWhiteSpace(_editTitle))
+                {
+                    _editJournal.Title = _editTitle;
+                }
+                Console.WriteLine("Enter new content for the journal. (Leave blank for no change)");
+                string _editContent = Console.ReadLine();
+                if(!string.IsNullOrWhiteSpace(_editContent))
+                {
+                    _editJournal.Content = _editContent;
+                }
+                _journalRepository.Update(_editJournal);
+                Console.WriteLine("Journal has been updated. Press any key to continue...");
+                Console.ReadKey();
+            }
     }
 }
