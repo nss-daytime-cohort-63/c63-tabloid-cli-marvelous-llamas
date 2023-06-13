@@ -24,6 +24,7 @@ namespace TabloidCLI.UserInterfaceManagers
 
         public IUserInterfaceManager Execute()
         {
+            Console.Clear();
             Console.WriteLine("Journal Menu");
             Console.WriteLine(" 1) List Journals");
             Console.WriteLine(" 2) Journal Details");
@@ -80,9 +81,9 @@ namespace TabloidCLI.UserInterfaceManagers
                 for (int i = 0; i < _journals.Count; i++)
                 {
                     Console.WriteLine($"{i}) {_journals[i].Title}");
+                }
                     Console.WriteLine("Press any key to continue...");
                     Console.ReadKey();
-                }
             }
             private Journal Choose()
             {
@@ -90,7 +91,7 @@ namespace TabloidCLI.UserInterfaceManagers
                 List<Journal> _selectJournals = _journalRepository.GetAll();
                 for(int i = 0; i < _selectJournals.Count; i++)
                 {
-                    Console.WriteLine($"{i}) {_selectJournals[i].Title}");
+                Console.WriteLine($"{_selectJournals[i].Id}) {_selectJournals[i].Title}");
                 }
 
                 int _chosenJournal = int.Parse(Console.ReadLine());
@@ -109,6 +110,8 @@ namespace TabloidCLI.UserInterfaceManagers
                     CreateDateTime = DateTime.Now
                 };
                 _journalRepository.Insert(_newJournal);
+                Console.WriteLine("Journal has been added! Press any key to continue...");
+                Console.ReadKey();
             }
 
             private void Edit()
