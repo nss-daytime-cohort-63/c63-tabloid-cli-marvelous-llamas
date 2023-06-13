@@ -9,12 +9,17 @@ namespace TabloidCLI.UserInterfaceManagers
     {
         private readonly IUserInterfaceManager _parentUI;
         private readonly PostRepository _postRepository;
+        private readonly AuthorRepository _authorRepository; // Add this field
+        private readonly BlogRepository _blogRepository; // Add this field
 
         public PostManager(IUserInterfaceManager parentUI, string connectionString)
         {
             _parentUI = parentUI;
             _postRepository = new PostRepository(connectionString);
+            _authorRepository = new AuthorRepository(connectionString); // Instantiate AuthorRepository
+            _blogRepository = new BlogRepository(connectionString); // Instantiate BlogRepository
         }
+
 
         public IUserInterfaceManager Execute()
         {
@@ -108,10 +113,28 @@ namespace TabloidCLI.UserInterfaceManagers
                 return;
             }
 
+            // Select an author for the post
+            Author selectedAuthor = SelectAuthor();
+            if (selectedAuthor == null)
+            {
+                Console.WriteLine("Invalid Author Selection");
+                return;
+            }
+            post.Author = selectedAuthor;
+
+            // Select a blog for the post
+            Blog selectedBlog = SelectBlog();
+            if (selectedBlog == null)
+            {
+                Console.WriteLine("Invalid Blog Selection");
+                return;
+            }
+            post.Blog = selectedBlog;
 
             // Insert the new post into the repository
             _postRepository.Insert(post);
         }
+
 
         private void Edit()
         {
@@ -191,5 +214,61 @@ namespace TabloidCLI.UserInterfaceManagers
                 return null;
             }
         }
+        private Author SelectAuthor()
+        {
+            Console.WriteLine("Select an Author:");
+
+            // Retrieve all authors from the repository
+            List<Author> authors = _authorRepository.GetAll();
+
+            // Display each author with a numeric index
+            for (int i = 0; i < authors.Count; i++)
+            {
+                Author author = authors[i];
+                Console.WriteLine($" {i + 1}) {author.FullName}");
+            }
+            Console.Write("> ");
+
+            string input = Console.ReadLine();
+            try
+            {
+                int choice = int.Parse(input);
+                return authors[choice - 1];
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Invalid Selection");
+                return null;
+            }
+        }
+
+        private Blog SelectBlog()
+        {
+            Console.WriteLine("Select a Blog:");
+
+            // Retrieve all blogs from the repository
+            List<Blog> blogs = _blogRepository.GetAll();
+
+            // Display each blog with a numeric index
+            for (int i = 0; i < blogs.Count; i++)
+            {
+                Blog blog = blogs[i];
+                Console.WriteLine($" {i + 1}) {blog.Title}");
+            }
+            Console.Write("> ");
+
+            string input = Console.ReadLine();
+            try
+            {
+                int choice = int.Parse(input);
+                return blogs[choice - 1];
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Invalid Selection");
+                return null;
+            }
+        }
+
     }
 }
