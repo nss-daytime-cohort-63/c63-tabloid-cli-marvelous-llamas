@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using TabloidCLI.Models;
@@ -54,17 +55,13 @@ namespace TabloidCLI.UserInterfaceManagers
         }
         private void View()
         {
-            Post post = _postRepository.Get(_postId);
-            try
+            List<Tag> _postTags = _postRepository.GetPostTags(_postId);
+            if( _postTags.Count > 0 )
             {
-                foreach (Tag tag in post.Tags)
+                foreach( Tag tag in _postTags )
                 {
-                    Console.WriteLine(" " + tag);
+                    Console.WriteLine(" " + tag.Name);
                 }
-            }
-            catch (NullReferenceException)
-            {
-                Console.WriteLine("No tags.");
             }
             Console.WriteLine("Press any key to continue...");
             Console.ReadKey();
