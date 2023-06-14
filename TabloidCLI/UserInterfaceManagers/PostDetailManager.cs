@@ -13,14 +13,18 @@ namespace TabloidCLI.UserInterfaceManagers
         private IUserInterfaceManager _parentUI;
         private PostRepository _postRepository;
         private TagRepository _tagRepository;
+        private NoteRepository _noteRepository;
         private int _postId;
+        private string _connectionString; // Add the connection string field
 
         public PostDetailManager(IUserInterfaceManager parentUI, string connectionString, int postId)
         {
             _parentUI = parentUI;
             _postRepository = new PostRepository(connectionString);
             _tagRepository = new TagRepository(connectionString);
+            _noteRepository = new NoteRepository(connectionString);
             _postId = postId;
+            _connectionString = connectionString; // Assign the provided connection string
         }
 
         public IUserInterfaceManager Execute()
@@ -30,6 +34,7 @@ namespace TabloidCLI.UserInterfaceManagers
             Console.WriteLine(" 1) View Tags");
             Console.WriteLine(" 2) Add Tag");
             Console.WriteLine(" 3) Remove Tag");
+            Console.WriteLine(" 4) Note Management");
             Console.WriteLine(" 0) Go Back");
 
             Console.Write("> ");
@@ -45,6 +50,8 @@ namespace TabloidCLI.UserInterfaceManagers
                 case "3":
                     //RemoveTag();
                     return this;
+                case "4":
+                    return new NoteManager(this, _connectionString, _postId); // Pass the connection string
                 case "0":
                     return _parentUI;
                 default:
@@ -52,6 +59,7 @@ namespace TabloidCLI.UserInterfaceManagers
                     return this;
             }
         }
+
         private void View()
         {
             Post post = _postRepository.Get(_postId);
