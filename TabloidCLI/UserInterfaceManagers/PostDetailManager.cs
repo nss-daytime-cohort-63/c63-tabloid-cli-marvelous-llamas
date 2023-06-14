@@ -63,8 +63,6 @@ namespace TabloidCLI.UserInterfaceManagers
                     Console.WriteLine(" " + tag.Name);
                 }
             }
-            Console.WriteLine("Press any key to continue...");
-            Console.ReadKey();
             Console.WriteLine();
         }
 
