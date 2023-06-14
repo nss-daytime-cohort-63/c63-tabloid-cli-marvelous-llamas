@@ -1,4 +1,5 @@
-﻿using TabloidCLI.UserInterfaceManagers;
+﻿using System;
+using TabloidCLI.UserInterfaceManagers;
 
 namespace TabloidCLI
 {
@@ -6,14 +7,17 @@ namespace TabloidCLI
     {
         static void Main(string[] args)
         {
-            // MainMenuManager implements the IUserInterfaceManager interface
-            IUserInterfaceManager ui = new MainMenuManager();
+            const string CONNECTION_STRING = @"Server=127.0.0.1; Database=TabloidCLI; User Id=sa; Password=MyPass@word;integrated security=true;TrustServerCertificate=true; Trusted_Connection=false;";
+
+            MainMenuManager mainMenu = new MainMenuManager();
+            IUserInterfaceManager ui = mainMenu;
             while (ui != null)
             {
-                // Each call to Execute will return the next IUserInterfaceManager we should execute
-                // When it returns null, we should exit the program;
                 ui = ui.Execute();
             }
+
+            Console.WriteLine("Press any key to exit...");
+            Console.ReadKey();
         }
     }
 }
