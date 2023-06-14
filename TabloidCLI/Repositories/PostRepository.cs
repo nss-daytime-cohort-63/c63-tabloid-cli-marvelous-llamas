@@ -110,9 +110,7 @@ namespace TabloidCLI.Repositories
                             {
                                 Id = reader.GetInt32(reader.GetOrdinal("BlogId")),
                                 Title = reader.GetString(reader.GetOrdinal("BlogTitle")),
-                                URL = reader.GetString(reader.GetOrdinal("BlogUrl")),
-<<<<<<< HEAD
-=======
+
                             }
                         };
 
@@ -173,7 +171,6 @@ namespace TabloidCLI.Repositories
                                 Id = reader.GetInt32(reader.GetOrdinal("BlogId")),
                                 Title = reader.GetString(reader.GetOrdinal("BlogTitle")),
                                 URL = reader.GetString(reader.GetOrdinal("BlogUrl")),
->>>>>>> 8678039fa2f65f9d22b11ff002a0b76a59f95f8c
                             }
                         };
                         posts.Add(post);
