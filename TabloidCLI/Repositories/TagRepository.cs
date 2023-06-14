@@ -246,19 +246,27 @@ namespace TabloidCLI
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"
-                    SELECT 'Author' AS Type, a.Id, a.FirstName, a.LastName, CAST(a.Bio AS VARCHAR(MAX)) AS Bio
-                    FROM Author a
-                    LEFT JOIN AuthorTag at ON a.Id = at.AuthorId
-                    LEFT JOIN Tag t ON t.Id = at.TagId
-                    WHERE t.Name LIKE @name
+                                    SELECT 'Author' AS Type, a.Id, a.FirstName, a.LastName, CAST(a.Bio AS VARCHAR(MAX)) AS Bio
+                                    FROM Author a
+                                    LEFT JOIN AuthorTag at ON a.Id = at.AuthorId
+                                    LEFT JOIN Tag t ON t.Id = at.TagId
+                                    WHERE t.Name LIKE @name
 
-                    UNION
+                                    UNION
+                                    
+                                    SELECT 'Blog' AS Type, b.Id, b.Title, b.URL, NULL AS Bio
+                                    FROM Blog b
+                                    LEFT JOIN BlogTag bt ON b.Id = bt.BlogId
+                                    LEFT JOIN Tag t ON t.Id = bt.TagId
+                                    WHERE t.Name LIKE @name
 
-                    SELECT 'Blog' AS Type, b.Id, b.Title, b.URL, NULL AS Bio
-                    FROM Blog b
-                    LEFT JOIN BlogTag bt ON b.Id = bt.BlogId
-                    LEFT JOIN Tag t ON t.Id = bt.TagId
-                    WHERE t.Name LIKE @name";
+                                    UNION
+
+                                    SELECT 'Post' AS Type, p.Id, p.Title, p.URL, NULL AS Bio
+                                    FROM Post p
+                                    LEFT JOIN PostTag pt ON p.Id = pt.PostId
+                                    LEFT JOIN Tag t ON t.Id = pt.TagId
+                                    WHERE t.Name LIKE @name";
 
                     cmd.Parameters.AddWithValue("@name", $"%{tagName}%");
                     SqlDataReader reader = cmd.ExecuteReader();
@@ -289,6 +297,16 @@ namespace TabloidCLI
                             };
                             results.Add(blog);
                         }
+                        else if (type == "Post")
+                        {
+                            Post post = new Post()
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                Title = reader.GetString(reader.GetOrdinal("Title")),
+                                URL = reader.GetString(reader.GetOrdinal("URL")),
+                            };
+                            results.Add(post);
+                        }
                     }
 
                     reader.Close();
@@ -299,3 +317,4 @@ namespace TabloidCLI
         }
     }
 }
+
