@@ -1,5 +1,9 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Text.RegularExpressions;
+using System.Xml.Linq;
 using Microsoft.Data.SqlClient;
 using TabloidCLI.Models;
 using TabloidCLI.Repositories;
@@ -160,6 +164,157 @@ namespace TabloidCLI
                     return results;
                 }
             }
+
+        }
+        public SearchResults<Blog> SearchBlogs(string tagName)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"SELECT b.Id,
+                                       b.Title,
+                                       b.URL
+                                  FROM Blog b
+                                       LEFT JOIN BlogTag bt ON b.Id = bt.BlogId
+                                       LEFT JOIN Tag t ON t.Id = bt.TagId
+                                 WHERE t.Name LIKE @name";
+                    cmd.Parameters.AddWithValue("@name", $"%{tagName}%");
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    SearchResults<Blog> results = new SearchResults<Blog>();
+                    while (reader.Read())
+                    {
+                        Blog blog = new Blog()
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            Title = reader.GetString(reader.GetOrdinal("Title")),
+                            URL = reader.GetString(reader.GetOrdinal("URL")),
+                        };
+                        results.Add(blog);
+                    }
+
+                    reader.Close();
+
+                    return results;
+                }
+            }
+        }
+
+        public SearchResults<Post> SearchPosts(string tagName)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"SELECT p.Id,
+                                       p.Title,
+                                       p.URL,
+                                       CONVERT(NVARCHAR(50), p.PublishDateTime, 20) AS PublishDateTime
+                                  FROM Post p
+                                       LEFT JOIN PostTag pt ON p.Id = pt.PostId
+                                       LEFT JOIN Tag t ON t.Id = pt.TagId
+                                 WHERE t.Name LIKE @name";
+                    cmd.Parameters.AddWithValue("@name", $"%{tagName}%");
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    SearchResults<Post> results = new SearchResults<Post>();
+                    while (reader.Read())
+                    {
+                        Post post = new Post()
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            Title = reader.GetString(reader.GetOrdinal("Title")),
+                            URL = reader.GetString(reader.GetOrdinal("URL")),
+                            PublishDateTime = DateTime.Parse(reader.GetString(reader.GetOrdinal("PublishDateTime"))),
+                        };
+                        results.Add(post);
+                    }
+                    reader.Close();
+                    return results;
+                }
+            }
+        }
+
+        public SearchResults<object> SearchAll(string tagName)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"
+                                    SELECT 'Author' AS Type, a.Id, a.FirstName, a.LastName, CAST(a.Bio AS VARCHAR(MAX)) AS Bio
+                                    FROM Author a
+                                    LEFT JOIN AuthorTag at ON a.Id = at.AuthorId
+                                    LEFT JOIN Tag t ON t.Id = at.TagId
+                                    WHERE t.Name LIKE @name
+
+                                    UNION
+                                    
+                                    SELECT 'Blog' AS Type, b.Id, b.Title, b.URL, NULL AS Bio
+                                    FROM Blog b
+                                    LEFT JOIN BlogTag bt ON b.Id = bt.BlogId
+                                    LEFT JOIN Tag t ON t.Id = bt.TagId
+                                    WHERE t.Name LIKE @name
+
+                                    UNION
+
+                                    SELECT 'Post' AS Type, p.Id, p.Title, p.URL, NULL AS Bio
+                                    FROM Post p
+                                    LEFT JOIN PostTag pt ON p.Id = pt.PostId
+                                    LEFT JOIN Tag t ON t.Id = pt.TagId
+                                    WHERE t.Name LIKE @name";
+
+                    cmd.Parameters.AddWithValue("@name", $"%{tagName}%");
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    SearchResults<object> results = new SearchResults<object>();
+                    while (reader.Read())
+                    {
+                        string type = reader.GetString(reader.GetOrdinal("Type"));
+
+                        if (type == "Author")
+                        {
+                            Author author = new Author()
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                                LastName = reader.GetString(reader.GetOrdinal("LastName")),
+                                Bio = reader.GetString(reader.GetOrdinal("Bio")),
+                            };
+                            results.Add(author);
+                        }
+                        else if (type == "Blog")
+                        {
+                            Blog blog = new Blog()
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                Title = reader.GetString(reader.GetOrdinal("Title")),
+                                URL = reader.GetString(reader.GetOrdinal("URL")),
+                            };
+                            results.Add(blog);
+                        }
+                        else if (type == "Post")
+                        {
+                            Post post = new Post()
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                Title = reader.GetString(reader.GetOrdinal("Title")),
+                                URL = reader.GetString(reader.GetOrdinal("URL")),
+                            };
+                            results.Add(post);
+                        }
+                    }
+
+                    reader.Close();
+
+                    return results;
+                }
+            }
         }
     }
 }
+
