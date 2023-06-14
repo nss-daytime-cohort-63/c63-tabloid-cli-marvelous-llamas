@@ -285,7 +285,7 @@ namespace TabloidCLI.Repositories
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"Select tag.Name from PostTag pt
+                    cmd.CommandText = @"Select tag.Name, tag.Id from PostTag pt
                                         left join Tag tag
                                         on pt.TagId = tag.Id
                                         where pt.PostId = @postId";
@@ -297,7 +297,8 @@ namespace TabloidCLI.Repositories
                         {
                             Tag _tempTag = new Tag()
                             {
-                                Name = reader.GetString(reader.GetOrdinal("Name")),
+                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                Name = reader.GetString(reader.GetOrdinal("Name"))
                             };
                             tags.Add(_tempTag);
                         }
