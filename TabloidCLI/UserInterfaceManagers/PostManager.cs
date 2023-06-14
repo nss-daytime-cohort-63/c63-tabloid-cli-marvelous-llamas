@@ -11,6 +11,7 @@ namespace TabloidCLI.UserInterfaceManagers
         private readonly PostRepository _postRepository;
         private readonly AuthorRepository _authorRepository; // Add this field
         private readonly BlogRepository _blogRepository; // Add this field
+        private readonly string _connectionString;
 
         public PostManager(IUserInterfaceManager parentUI, string connectionString)
         {
@@ -18,6 +19,7 @@ namespace TabloidCLI.UserInterfaceManagers
             _postRepository = new PostRepository(connectionString);
             _authorRepository = new AuthorRepository(connectionString); // Instantiate AuthorRepository
             _blogRepository = new BlogRepository(connectionString); // Instantiate BlogRepository
+            _connectionString = connectionString;
         }
 
 
@@ -40,8 +42,9 @@ namespace TabloidCLI.UserInterfaceManagers
                     List();
                     return this;
                 case "2":
-                    ViewDetails();
-                    return this;
+                    Post post = Choose("Which post would you like to view?");
+                    ViewDetails(post);
+                    return new PostDetailManager(this, _connectionString, post.Id);
                 case "3":
                     Add();
                     return this;
@@ -67,14 +70,13 @@ namespace TabloidCLI.UserInterfaceManagers
             // Display each post
             foreach (Post post in posts)
             {
-                Console.WriteLine(post);
+                Console.WriteLine(post.Title);
             }
         }
 
-        private void ViewDetails()
+        private void ViewDetails(Post post)
         {
             // Choose a post to view its details
-            Post post = Choose("Which post would you like to view?");
             if (post == null)
             {
                 return;
