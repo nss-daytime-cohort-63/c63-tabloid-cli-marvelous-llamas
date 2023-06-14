@@ -7,7 +7,7 @@ namespace TabloidCLI
     {
         static void Main(string[] args)
         {
-            const string CONNECTION_STRING = @"Data Source=localhost\SQLEXPRESS07;Database=TabloidCLI;Integrated Security=True";
+            const string CONNECTION_STRING = @"Server=127.0.0.1; Database=TabloidCLI; User Id=sa; Password=MyPass@word;integrated security=true;TrustServerCertificate=true; Trusted_Connection=false;";
 
             MainMenuManager mainMenu = new MainMenuManager();
             IUserInterfaceManager ui = mainMenu;
@@ -21,3 +21,4 @@ namespace TabloidCLI
         }
     }
 }
+
