@@ -110,7 +110,7 @@ namespace TabloidCLI.Repositories
                             {
                                 Id = reader.GetInt32(reader.GetOrdinal("BlogId")),
                                 Title = reader.GetString(reader.GetOrdinal("BlogTitle")),
-
+                                URL = reader.GetString(reader.GetOrdinal("BlogUrl")),
                             }
                         };
 
